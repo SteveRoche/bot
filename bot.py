@@ -7,9 +7,8 @@ from flask import Flask, request, abort
 
 memes = [item for item in os.listdir(os.path.join(os.getcwd(), 'memes')) if item != 'file_data.json']
 
-API_TOKEN = os.environ.get('BOT_TOKEN')
-if not API_TOKEN:
-	print('Could not find TOKEN')
+with open('TOKEN', 'r') as f:
+	API_TOKEN = f.read()
 
 class Bot:
 	def __init__(self, token, offset=0):
@@ -32,7 +31,7 @@ class Bot:
 		requests.post(
 			self.__buildCommand('sendPhoto'), 
 			files={ 'photo': open('memes/{filename}'.format(filename=random.choice(memes)), 'rb')},
-			data={ 'chat_id': chatId}
+			data={ 'chat_id': chatId }
 		)
 
 	def __buildCommand(self, command):
