@@ -3,52 +3,45 @@ import random
 import json
 import requests
 from time import sleep
-from flask import Flask, request, abort
 
-memes = [item for item in os.listdir(os.path.join(os.getcwd(), 'memes')) if item != 'file_data.json']
+# Assuming comic files are in a folder 'comics'
+comics = [item for item in os.listdir(os.path.join(os.getcwd(), 'comics'))]
 
-with open('TOKEN', 'r') as f:
-	API_TOKEN = f.read()
+API_TOKEN = '658464525:AAGJvbIW1VzIZXw2bAscnrSfsrFbMdhFHuE'
 
-class Bot:
-	def __init__(self, token, offset=0):
-		self.url = 'https://api.telegram.org/bot{token}/'.format(token=token)
-		self.offset = offset
+base_url = 'https://api.telegram.org/bot{token}/'.format(token=API_TOKEN)
 
-	def getMe(self):
-		return requests.get(''.join([self.url, 'getMe'])).json()
+current_offset = 0
 
-	def getUpdates(self):
-		return requests.get(''.join([self.url, 'getUpdates']), params={'offset': self.offset}).json()
+def getMe():
+	return requests.get(''.join([base_url, 'getMe'])).json()
 
-	def sendMessage(self, chatId, text):
-		requests.get(self.__buildCommand('sendMessage'), params={
-			'chat_id': chatId,
-			'text': text,
-		})
+def getUpdates():
+	return requests.get(''.join([base_url, 'getUpdates']), params={'offset': current_offset}).json()
 
-	def sendPhoto(self, chatId):
-		requests.post(
-			self.__buildCommand('sendPhoto'), 
-			files={ 'photo': open('memes/{filename}'.format(filename=random.choice(memes)), 'rb')},
-			data={ 'chat_id': chatId }
-		)
+def sendMessage(chatId, text):
+	requests.get(''.join([base_url, 'sendMessage']), params={
+		'chat_id': chatId,
+		'text': text,
+	})
 
-	def __buildCommand(self, command):
-		return ''.join([self.url, command])
-
-bot = Bot(API_TOKEN)
+def sendPhoto(chatId):
+	requests.post(
+		''.join([base_url, 'sendPhoto']), 
+		files={ 'photo': open('comics/{filename}'.format(filename=random.choice(comics)), 'rb')},
+		data={ 'chat_id': chatId }
+	)
 
 while True:
-	results = bot.getUpdates()['result']
+	results = getUpdates()['result']
 	for result in results:
 		update_id = result['update_id']
 		chat_id = result['message']['chat']['id']
-		if bot.offset <= update_id:
-			bot.offset = update_id + 1
+		if current_offset <= update_id:
+			current_offset = update_id + 1
 
 			if result['message']['text'] == '/memeplz':
-				bot.sendPhoto(chat_id)
+				sendPhoto(chat_id)
 			else:
-				bot.sendMessage(chat_id, 'Ask for a meme')
+				sendMessage(chat_id, 'Ask for a meme')
 	sleep(2)

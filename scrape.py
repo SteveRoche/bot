@@ -8,9 +8,7 @@ if not os.path.exists(os.path.join(os.getcwd(), 'memes')):
 	os.makedirs(os.path.join(os.getcwd(), 'memes'))
 
 # Request headers to avoid 403 Forbidden
-HEADERS = {
-	'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
-}
+HEADERS = { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 
 link = 'https://knowyourmeme.com/memes/memes/photos/trending'
 
